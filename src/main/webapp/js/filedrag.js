@@ -2,7 +2,7 @@
 filedrag.js - HTML5 File Drag & Drop demonstration
 Featured on SitePoint.com
 Developed by Craig Buckler (@craigbuckler) of OptimalWorks.net
-*/
+ */
 (function() {
 
 	// getElementById
@@ -10,13 +10,11 @@ Developed by Craig Buckler (@craigbuckler) of OptimalWorks.net
 		return document.getElementById(id);
 	}
 
-
 	// output information
 	function Output(msg) {
 		var m = $id("messages");
 		m.innerHTML = msg + m.innerHTML;
 	}
-
 
 	// file drag hover
 	function FileDragHover(e) {
@@ -24,7 +22,6 @@ Developed by Craig Buckler (@craigbuckler) of OptimalWorks.net
 		e.preventDefault();
 		e.target.className = (e.type == "dragover" ? "hover" : "");
 	}
-
 
 	// file selection
 	function FileSelectHandler(e) {
@@ -36,67 +33,70 @@ Developed by Craig Buckler (@craigbuckler) of OptimalWorks.net
 		var files = e.target.files || e.dataTransfer.files;
 
 		// process all File objects
-		for (var i = 0, f; f = files[i]; i++) {
+		for ( var i = 0, f; f = files[i]; i++) {
 			ParseFile(f);
 			UploadFile(f);
 		}
 
 	}
 
-
 	// output file information
 	function ParseFile(file) {
-
-		Output(
-			"<p>File information: <strong>" + file.name +
-			"</strong> type: <strong>" + file.type +
-			"</strong> size: <strong>" + file.size +
-			"</strong> bytes</p>"
-		);
 
 		// display an image
 		if (file.type.indexOf("image") == 0) {
 			var reader = new FileReader();
 			reader.onload = function(e) {
-				Output(
-					"<p><strong>" + file.name + ":</strong><br />" +
-					'<img src="' + e.target.result + '" /></p>'
-				);
+				Output("<p><strong>" + file.name + "</strong>"
+						+ "</strong> (type: <strong>" + file.type
+						+ "</strong> size: <strong>" + file.size
+						+ "</strong> bytes)</p>"
+						+ '<p><img src="' + e.target.result
+						+ '" class="preview"/></p>');
 			}
 			reader.readAsDataURL(file);
 		}
 
 		// display text
-		if (file.type.indexOf("text") == 0) {
+		else if (file.type.indexOf("text") == 0) {
 			var reader = new FileReader();
 			reader.onload = function(e) {
-				Output(
-					"<p><strong>" + file.name + ":</strong></p><pre>" +
-					e.target.result.replace(/</g, "&lt;").replace(/>/g, "&gt;") +
-					"</pre>"
-				);
+				Output("<p><strong>"+ file.name	+ "</strong>" +
+						+ "</strong> (type: <strong>" + file.type
+						+ "</strong> size: <strong>" + file.size
+						+ "</strong> bytes)</p><pre>"
+						+ e.target.result.replace(/</g, "&lt;").replace(/>/g,
+								"&gt;") + "</pre>");
 			}
 			reader.readAsText(file);
+		} else {
+			Output("<p><strong>" + file.name
+					+ "</strong> (type: <strong>" + file.type
+					+ "</strong> size: <strong>" + file.size
+					+ "</strong> bytes)</p>");
+
 		}
-
 	}
-
 
 	// upload JPEG files
 	function UploadFile(file) {
 
-		// following line is not necessary: prevents running on SitePoint servers
-		if (location.host.indexOf("sitepointstatic") >= 0) return
+		// following line is not necessary: prevents running on SitePoint
+		// servers
+		if (location.host.indexOf("sitepointstatic") >= 0)
+			return
 
 		var xhr = new XMLHttpRequest();
-//		if (xhr.upload && file.type == "image/jpeg" && file.size <= $id("MAX_FILE_SIZE").value) {
-		if (xhr.upload) { //  && file.size <= 30000) {
+		// if (xhr.upload && file.type == "image/jpeg" && file.size <=
+		// $id("MAX_FILE_SIZE").value) {
+		if (xhr.upload) { // && file.size <= 30000) {
 
 			// create progress bar
 			var o = $id("progress");
 			var progress = o.appendChild(document.createElement("p"));
-			progress.appendChild(document.createTextNode("upload " + file.name));
+			var responseNode = document.createTextNode("[" + file.name + "] ");
 
+			progress.appendChild(responseNode);
 
 			// progress bar
 			xhr.upload.addEventListener("progress", function(e) {
@@ -107,26 +107,43 @@ Developed by Craig Buckler (@craigbuckler) of OptimalWorks.net
 			// file received/failed
 			xhr.onreadystatechange = function(e) {
 				if (xhr.readyState == 4) {
-					progress.className = (xhr.status == 200 ? "success" : "failure");
+					progress.className = (xhr.status == 200 ? "success"
+							: "failure")
+
+					if (xhr.status == 200) {
+
+						var response = xhr.responseText.split('$$$');
+
+						progress.appendChild(document
+								.createTextNode(response[0]));
+
+						var link = document.createElement('a');
+						link.setAttribute('href', response[1]);
+						link.appendChild(document.createTextNode(response[1]));
+						progress.appendChild(link);
+
+					} else {
+						progress.appendChild(document
+								.createTextNode(xhr.responseText));
+					}
+
 				}
 			};
 
 			// start upload
 			xhr.open("POST", $id("upload").action, true);
-			xhr.setRequestHeader("X_FILENAME", file.name);
-			xhr.send(file);
 
+			var formData = new FormData();
+			formData.append('file', file);
+			xhr.send(formData);
 		}
 
 	}
 
-
 	// initialize
 	function Init() {
 
-		var fileselect = $id("fileselect"),
-			filedrag = $id("filedrag"),
-			submitbutton = $id("submitbutton");
+		var fileselect = $id("fileselect"), filedrag = $id("filedrag"), submitbutton = $id("submitbutton");
 
 		// file select
 		fileselect.addEventListener("change", FileSelectHandler, false);
@@ -151,6 +168,5 @@ Developed by Craig Buckler (@craigbuckler) of OptimalWorks.net
 	if (window.File && window.FileList && window.FileReader) {
 		Init();
 	}
-
 
 })();

@@ -188,13 +188,11 @@
                <h3>Dropspace File Upload</h3>
                 <div data-role="content">
                     <!-- For now mapping bean validation constraints from server side model is a manual task -->
-					<form id="upload" name="upload" action="./rest/upload" method="POST" enctype="multipart/form-data">
+					<form id="upload" name="upload" action="rest/upload" method="POST" enctype="multipart/form-data">
 						<fieldset>
 	                            <legend>Choose some files</legend>
-								<input type="hidden" id="MAX_FILE_SIZE" name="MAX_FILE_SIZE" value="300000" />
 								<div>
-									<label for="fileselect">Files to upload:</label>
-									<input type="file" id="fileselect" name="fileselect[]" multiple="multiple" placeholder="Please select your files ..." required autofocus/>
+									<input type="file" id="fileselect" name="fileselect[]" multiple="multiple" size="70" required autofocus/>
 									<div id="filedrag">or drop files here</div>
 								</div>
 								
@@ -212,7 +210,7 @@
 				<br/>
 				
 				<fieldset id="messages">
-					<legend>Status Messages</legend>
+					<legend>Status messages</legend>
 				</fieldset>
             </article>
 
@@ -220,7 +218,6 @@
 
         <!-- New HTML5 footer tag -->
         <footer>
-            <!--<img src="img/logo.png" alt="HTML5"/>-->
             <p>This project was created by Red Hat Consulting.<br/></p>
         </footer>
     </div>

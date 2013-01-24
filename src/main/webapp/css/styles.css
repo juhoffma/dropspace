@@ -55,9 +55,14 @@ img
 	max-width: 100%;
 }
 
+img.preview
+{
+	max-width: 800px;
+}
+
 pre
 {
-	width: 95%;
+	width: 800px;
 	height: 8em;
 	font-family: monospace;
 	font-size: 0.9em;
