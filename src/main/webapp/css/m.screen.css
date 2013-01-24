@@ -142,42 +142,6 @@ a {
    padding-right: 5px;
 }
 
-/* Member table styles */
-#members .row .col .head {
-    float: left;
-    width: 70px;
-    border: none;
-    padding: 4px 5px;
-}
-
-#members .row .col {
-    width: 100%;
-    float: left;
-    clear: left;
-    background-color: #fff;
-    border: 1px dotted #ccc;
-}
-
-#members .row .col .data {
-    padding: 4px 4px 4px 94px;
-}
-
-#members .col:nth-child(5) {
-    margin-bottom: 20px;
-}
-
-#member-art {
-    padding-top: 30px!important;
-}
-
-#member-art .ui-content .ui-btn {
-    float: right;
-}
-
-/* Hide column header rows if present */
-.columnNames {
-    display: none;
-}
 
 /* Hide Desktop Items */
 section > h1, article > h2, aside > h3, footer, .member-foot .ui-btn, .highlights, .logo, .dualbrand {
