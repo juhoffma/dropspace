@@ -1,12 +1,12 @@
 package com.redhat.juhoffma.rest;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.util.Date;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import com.redhat.juhoffma.data.FileRepository;
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateFormatUtils;
+import org.jboss.resteasy.plugins.providers.multipart.InputPart;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
@@ -15,14 +15,13 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.DateFormatUtils;
-import org.jboss.resteasy.plugins.providers.multipart.InputPart;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
-
-import com.redhat.juhoffma.data.FileRepository;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.util.Date;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * REST upload service.
@@ -41,8 +40,8 @@ public class UploadService {
 
 	/**
 	 * 
-	 * @param dataInput
-	 * @return
+	 * @param dataInput the uploaded file as MultipartFormDataInput
+	 * @return regular HTTP Response (200 on success and 500 on failure)
 	 */
 	@POST
 	@Consumes("multipart/form-data")
@@ -83,11 +82,9 @@ public class UploadService {
 	}
 
 	/**
-	 * Header sample { Content-Type=[image/png], Content-Disposition=[form-data;
-	 * name="file"; filename="filename.extension"] }
-	 * 
-	 * @param header
-	 * @return
+	 * @param header  Header sample { Content-Type=[image/png], Content-Disposition=[form-data;
+     * name="file"; filename="filename.extension"] }
+	 * @return a filename that replaces all double quotes with nothing
 	 */
 	private String getFileName(MultivaluedMap<String, String> header) {
 
@@ -102,30 +99,35 @@ public class UploadService {
 	/**
 	 * Stores the file somewhere else.
 	 * 
-	 * @param content
-	 * @param filename
+	 * @param content the bytes of the file
+	 * @param uploadedFileName the filename of the uploaded file
 	 * @throws Exception
 	 */
 	protected String storeFile(byte[] content, String uploadedFileName) throws Exception {
 
 		final String time = DateFormatUtils.format(new Date(), "yyyyMMdd-HHmmss.S");
 		final String storageFileName = "/tmp/" + uploadedFileName + time + ".uploaded";
-		// TODO use a real hash function (MD5)
-		final String hashValue = time;
 
-		File file = null;
+		// TODO use a real hash function (MD5)
+		final String hashValue = DigestUtils.shaHex(uploadedFileName + System.currentTimeMillis());
+
+		File file;
 		FileOutputStream fop = null;
 		boolean success = false;
 		try {
 			file = new File(storageFileName);
-			if (!file.exists()) {
-				file.createNewFile();
+			if (file.createNewFile()) {
+                fop = new FileOutputStream(file);
+                fop.write(content);
+                fop.flush();
+                success = true;
 			}
-			fop = new FileOutputStream(file);
-			fop.write(content);
-			fop.flush();
-			success = true;
+            else
+            {
+                throw new Exception("File " + storageFileName + " already exists");
+            }
 		} catch (Exception e) {
+            LOG.log(Level.WARNING, "Caught an exception while trying to store file " + storageFileName + " (" + e.getMessage()+")");
 			throw e;
 		} finally {
 			if (success) {
