@@ -105,11 +105,10 @@ public class UploadService {
 	 */
 	protected String storeFile(byte[] content, String uploadedFileName) throws Exception {
 
+        final String hashValue = DigestUtils.sha256Hex(uploadedFileName + System.currentTimeMillis());
 		final String time = DateFormatUtils.format(new Date(), "yyyyMMdd-HHmmss.S");
-		final String storageFileName = "/tmp/" + uploadedFileName + time + ".uploaded";
-
-		// TODO use a real hash function (MD5)
-		final String hashValue = DigestUtils.shaHex(uploadedFileName + System.currentTimeMillis());
+        final String fileDirectory = System.getProperty("OPENSHIFT_DATA_DIR", "/tmp");
+        final String storageFileName = fileDirectory + System.getProperty("file.separator") + uploadedFileName + "-" + hashValue + "-" + time + ".uploaded";
 
 		File file;
 		FileOutputStream fop = null;
