@@ -3,6 +3,7 @@ filedrag.js - HTML5 File Drag & Drop demonstration
 Featured on SitePoint.com
 Developed by Craig Buckler (@craigbuckler) of OptimalWorks.net
  */
+
 (function() {
 
 	// getElementById
@@ -94,8 +95,8 @@ Developed by Craig Buckler (@craigbuckler) of OptimalWorks.net
 			// create progress bar
 			var o = $id("progress");
 			var progress = o.appendChild(document.createElement("p"));
-			var responseNode = document.createTextNode("[" + file.name + "] ");
-
+			var responseNode = document.createElement('strong');
+			responseNode.appendChild(document.createTextNode("[" + file.name + "] "));
 			progress.appendChild(responseNode);
 
 			// progress bar
@@ -107,24 +108,50 @@ Developed by Craig Buckler (@craigbuckler) of OptimalWorks.net
 			// file received/failed
 			xhr.onreadystatechange = function(e) {
 				if (xhr.readyState == 4) {
-					progress.className = (xhr.status == 200 ? "success"
-							: "failure")
+					
+					$id("fileselect").value = '';
+					
+					progress.className = (xhr.status == 200 ? "success" : "failure")
 
 					if (xhr.status == 200) {
 
 						var response = xhr.responseText.split('$$$');
 
-						progress.appendChild(document
-								.createTextNode(response[0]));
-
-						var link = document.createElement('a');
-						link.setAttribute('href', response[1]);
-						link.appendChild(document.createTextNode(response[1]));
-						progress.appendChild(link);
+						progress.appendChild(document.createTextNode(response[0]));
+						
+						var iconMail = document.createElement('img')
+						iconMail.setAttribute('src', 'img/icon-mail-generic.png');
+						iconMail.setAttribute('alt','');
+						iconMail.setAttribute('title','');
+						iconMail.setAttribute('style','display: inline-block; vertical-align: middle;');
+						
+						var iconSave = document.createElement('img')
+						
+						iconSave.setAttribute('src', 'img/icon-link.png');
+						iconSave.setAttribute('alt','');
+						iconSave.setAttribute('title','');
+						iconSave.setAttribute('style','display: inline-block; vertical-align: middle;');
+						
+						var divContainer  = document.createElement('div');
+						divContainer.setAttribute('style','display: inline-block; float:right;');
+						progress.appendChild(divContainer);
+						
+						var downloadLink = document.createElement('a');
+						downloadLink.setAttribute('href', response[1]);
+						downloadLink.appendChild(iconSave);
+						downloadLink.appendChild(document.createTextNode(' Link'));
+						divContainer.appendChild(downloadLink);
+						
+						divContainer.appendChild(document.createTextNode('  -  '));
+						
+						var mailLink = document.createElement('a');
+						mailLink.setAttribute('href', 'mailto:person_AT_email.com&amp;body='+encodeURIComponent('Check this! '+window.location.toString()+response[1]));
+						mailLink.appendChild(iconMail);
+						mailLink.appendChild(document.createTextNode(' Mail'));
+						divContainer.appendChild(mailLink);
 
 					} else {
-						progress.appendChild(document
-								.createTextNode(xhr.responseText));
+						progress.appendChild(document.createTextNode("Upload failed"));
 					}
 
 				}
@@ -139,7 +166,7 @@ Developed by Craig Buckler (@craigbuckler) of OptimalWorks.net
 		}
 
 	}
-
+	
 	// initialize
 	function Init() {
 

@@ -142,16 +142,39 @@ legend {
 
 /* Responsive Styles */
 @media only screen and (max-width: 875px) {
-    #container {
+
+	#container {
         width: 575px;
     }
 
+	section {
+		max-width: 510px;		
+	}
+    
     aside {
         clear: both;
         float: none;
         width: 510px;
         margin: 20px;
     }
+    
+	fieldset {
+	    width: 500px;
+	}
+	
+	#progress p {
+		width: 520px;
+	}
+	
+	pre {
+		width: 500px;
+	}
+	
+	img.preview {
+		max-width: 500px;
+	}
+	
+	    
 }
 
 /* Hide Mobile Site Elements */
