@@ -42,9 +42,16 @@ jQuery Mobile announces support.
  
 With the prerequisites out of the way, you're ready to build and deploy.
 
+Openshift requirement
+---------------------
+
+If you want to deploy this application in Openshift, please update the persistence.xml file by replacing the ExampleDS line by the PostgreSQLDS one:
+
+	<jta-data-source>java:jboss/datasources/PostgreSQLDS</jta-data-source>
+
+
 Deploying the application
 -------------------------
-
 
 First you need to start the JBoss container. To do this, run
   

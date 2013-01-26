@@ -23,9 +23,12 @@
         http://java.sun.com/xml/ns/persistence
         http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
    <persistence-unit name="primary">
-      <!-- If you are running in a production environment, add a managed 
-         data source, the example data source is just for proofs of concept! -->
-      <jta-data-source>java:jboss/datasources/ExampleDS</jta-data-source>
+		<!-- JBoss EAP example data source (not for productive use) -->
+		<jta-data-source>java:jboss/datasources/ExampleDS</jta-data-source>
+		<!-- Data source for Openshift -->
+		<!-- 
+        <jta-data-source>java:jboss/datasources/PostgreSQLDS</jta-data-source>
+ 		-->
       <properties>
          <!-- Properties for Hibernate -->
          <property name="hibernate.hbm2ddl.auto" value="create-drop" />

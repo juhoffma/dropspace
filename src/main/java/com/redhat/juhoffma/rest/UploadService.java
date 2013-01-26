@@ -1,12 +1,11 @@
 package com.redhat.juhoffma.rest;
 
-import com.redhat.juhoffma.data.FileRepository;
-import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.DateFormatUtils;
-import org.jboss.resteasy.plugins.providers.multipart.InputPart;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
@@ -15,13 +14,15 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.util.Date;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.FastDateFormat;
+import org.jboss.resteasy.plugins.providers.multipart.InputPart;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
+
+import com.redhat.juhoffma.data.FileRepository;
 
 /**
  * REST upload service.
@@ -38,6 +39,8 @@ public class UploadService {
 	@Inject
 	private FileRepository fileRepository;
 
+	private final static String FILE_SEPARATOR = System.getProperty("file.separator");
+	
 	/**
 	 * 
 	 * @param dataInput the uploaded file as MultipartFormDataInput
@@ -76,7 +79,7 @@ public class UploadService {
 			}
 		}
 
-		final String message = "Upload successful - $$$rest/dl/file/" + hashValue;
+		final String message = "Upload successful$$$rest/dl/file/" + hashValue;
 		LOG.info(">>> uploadFile - " + message);
 		return Response.status(200).entity(message).build();
 	}
@@ -106,9 +109,13 @@ public class UploadService {
 	protected String storeFile(byte[] content, String uploadedFileName) throws Exception {
 
         final String hashValue = DigestUtils.sha256Hex(uploadedFileName + System.currentTimeMillis());
-		final String time = DateFormatUtils.format(new Date(), "yyyyMMdd-HHmmss.S");
-        final String fileDirectory = System.getenv("OPENSHIFT_DATA_DIR");
-        final String storageFileName = fileDirectory + System.getProperty("file.separator") + uploadedFileName + "-" + hashValue + "-" + time + ".uploaded";
+		final String time = FastDateFormat.getInstance("yyyy-MM-dd-HH.mm.ss").format(System.currentTimeMillis());
+        String fileDirectory = System.getenv("OPENSHIFT_DATA_DIR");
+        if(StringUtils.isEmpty(fileDirectory))
+        {
+        	fileDirectory = FILE_SEPARATOR+"tmp";
+        }
+        final String storageFileName = fileDirectory + FILE_SEPARATOR  + uploadedFileName + "-" + hashValue + "-" + time + ".uploaded";
 
 		File file;
 		FileOutputStream fop = null;

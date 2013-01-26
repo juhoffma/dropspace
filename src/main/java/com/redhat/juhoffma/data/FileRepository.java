@@ -16,33 +16,65 @@
  */
 package com.redhat.juhoffma.data;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.enterprise.context.ApplicationScoped;
+import javax.ejb.Stateless;
+import javax.inject.Inject;
+import javax.persistence.EntityManager;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 
 import com.redhat.juhoffma.model.File;
 
-@ApplicationScoped
+/**
+ * DAO for Files.
+ * 
+ * @author mzottner
+ */
+@Stateless
 public class FileRepository {
 
-	final Map<String, File> fileRepository = new HashMap<String, File>();
+	@Inject
+	private EntityManager em;
 
+	/**
+	 * Empty constructor.
+	 */
 	public FileRepository() {
-
 	}
 
-	public void storeFile(File file) {
-		fileRepository.put(file.getHashValue(), file);
+	/**
+	 * Stores a file instance.
+	 * 
+	 * @param file
+	 */
+	public void storeFile(final File file) {
+		em.persist(file);
 	}
 
-	public File findByHashValue(String hashValue) {
-		return fileRepository.get(hashValue);
+	/**
+	 * Storage helper.
+	 * 
+	 * @param uploadedFileName
+	 * @param storageFileName
+	 * @param hashValue
+	 */
+	public void storeFile(final String uploadedFileName, final String storageFileName, final String hashValue) {
+		storeFile(new File(uploadedFileName, storageFileName, hashValue));
 	}
 
-	public void storeFile(String uploadedFileName, String storageFileName, String hashValue) {
-		File f = new File(uploadedFileName, storageFileName, hashValue);
-		storeFile(f);
+	/**
+	 * Search for a file according its hashValue.
+	 * 
+	 * @param hashValue
+	 * @return file
+	 */
+	public File findByHashValue(final String hashValue) {
+
+		final CriteriaBuilder cb = em.getCriteriaBuilder();
+		final CriteriaQuery<File> criteria = cb.createQuery(File.class);
+		final Root<File> rootFile = criteria.from(File.class);
+		criteria.select(rootFile).where(cb.equal(rootFile.get("hashValue"), hashValue));
+		return em.createQuery(criteria).getSingleResult();
 	}
 
 }

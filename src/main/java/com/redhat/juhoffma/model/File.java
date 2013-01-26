@@ -17,28 +17,65 @@
 package com.redhat.juhoffma.model;
 
 import java.io.Serializable;
-import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
+import javax.validation.constraints.NotNull;
+import javax.xml.bind.annotation.XmlRootElement;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
-//@Entity
-//@XmlRootElement
-//@Table(name = "File_html5mobi", uniqueConstraints = @UniqueConstraint(columnNames = "hashValue"))
+/**
+ * File model object.
+ * 
+ * @author mzottner
+ */
+@Entity
+@XmlRootElement
+@Table(name = "File_html5mobi", uniqueConstraints = @UniqueConstraint(columnNames = "hash_value"))
 public class File implements Serializable {
 
+	/** Serial version UID. */
 	private static final long serialVersionUID = 201301241729L;
 
-	// @NotNull
-	protected final String hashValue;
+	/**
+	 * Hash value for file identification.
+	 */
+	@Id
+	@NotNull
+	@Column(name = "hash_value")
+	protected String hashValue;
 
-	// @NotNull
-	protected final String uploadedFileName;
+	/**
+	 * Name of file upladed in dropspace.
+	 */
+	@NotNull
+	@Column(name = "uploaded_file_name")
+	protected String uploadedFileName;
 
-	// @NotNull
-	protected final String storageFileName;
+	/**
+	 * Name of the file
+	 */
+	@NotNull
+	@Column(name = "storage_file_name")
+	protected String storageFileName;
 
-	protected final Date uploadDate;
+	/**
+	 * Date of the upload.
+	 */
+	@NotNull
+	@Column(name = "upload_date")
+	protected Long uploadDate;
+
+	/**
+	 * Empty constructor for JPA.
+	 */
+	public File() {
+	}
 
 	/**
 	 * Constructor.
@@ -47,11 +84,11 @@ public class File implements Serializable {
 	 * @param storageFileName
 	 * @param hashValue
 	 */
-	public File(String uploadedFileName, String storageFileName, String hashValue) {
+	public File(final String uploadedFileName, final String storageFileName, final String hashValue) {
 		this.uploadedFileName = uploadedFileName;
 		this.storageFileName = storageFileName;
 		this.hashValue = hashValue;
-		this.uploadDate = new Date();
+		this.uploadDate = System.currentTimeMillis();
 	}
 
 	public String getUploadedFileName() {
@@ -66,7 +103,7 @@ public class File implements Serializable {
 		return storageFileName;
 	}
 
-	public Date getUploadDate() {
+	public Long getUploadDate() {
 		return uploadDate;
 	}
 
