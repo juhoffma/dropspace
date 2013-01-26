@@ -107,7 +107,7 @@ public class UploadService {
 
         final String hashValue = DigestUtils.sha256Hex(uploadedFileName + System.currentTimeMillis());
 		final String time = DateFormatUtils.format(new Date(), "yyyyMMdd-HHmmss.S");
-        final String fileDirectory = System.getProperty("OPENSHIFT_DATA_DIR", "/tmp");
+        final String fileDirectory = System.getenv("OPENSHIFT_DATA_DIR");
         final String storageFileName = fileDirectory + System.getProperty("file.separator") + uploadedFileName + "-" + hashValue + "-" + time + ".uploaded";
 
 		File file;
